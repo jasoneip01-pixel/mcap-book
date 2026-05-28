@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>十年巨变 · 市值之书</title>
+<style>
+:root{--bg:#0d0d0d;--paper:#f5f0e8;--ink:#1a1a1a;--gold:#c9a84c;--green:#1e8449;--blue:#2471a3;--red:#8b1a1a;--purple:#6c3483}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);display:flex;justify-content:center;align-items:center;min-height:100dvh;padding:12px;font-family:Georgia,'Noto Serif SC','Source Han Serif SC',serif;user-select:none;touch-action:none}
+.book-stage{perspective:2200px;width:min(100% - 24px,420px);position:relative;display:flex;justify-content:center}
+.book-shadow{position:absolute;bottom:-10px;left:6%;width:88%;height:28px;background:radial-gradient(ellipse at center,rgba(0,0,0,.4) 0%,transparent 70%);filter:blur(12px);pointer-events:none;z-index:0}
+.book{position:relative;width:100%;aspect-ratio:3/4;transform-style:preserve-3d;z-index:1}
+.page{position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden;border-radius:3px;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:clamp(8px,2vw,20px)}
+.page-current{z-index:2;filter:drop-shadow(0 4px 16px rgba(0,0,0,.35))}
+.page-underneath{z-index:1}
+.page-flipper{position:absolute;top:0;left:0;width:100%;height:100%;z-index:4;transform-style:preserve-3d;transform-origin:left center;pointer-events:none;will-change:transform}
+.page-flipper .page-front,.page-flipper .page-back{position:absolute;top:0;left:0;width:100%;height:100%;backface-visibility:hidden;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:clamp(8px,2vw,20px)}
+.page-flipper .page-back{transform:rotateY(180deg);background:linear-gradient(135deg,#f5f0e8 0%,#ede5d5 50%,#f0e8d8 100%)}
+.page-flipper .page-back::after{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#f5f0e8 0%,#ede5d5 50%,#f0e8d8 100%);opacity:.15;z-index:-1}
+.nav-zone{position:absolute;top:0;height:100%;width:35%;z-index:10;cursor:pointer}
+.nav-left{left:0}.nav-right{right:0}
+.indicator{position:fixed;bottom:clamp(20px,3.5vh,36px);left:50%;transform:translateX(-50%);background:rgba(0,0,0,.7);color:rgba(255,255,255,.85);padding:6px 18px;border-radius:16px;font-size:clamp(11px,2vw,14px);z-index:20;backdrop-filter:blur(10px);pointer-events:none;font-family:-apple-system,'PingFang SC',sans-serif;transition:opacity 0.3s ease}
+
+/* ===== Flip shadow ===== */
+.curl-shadow{position:absolute;top:0;left:-8px;width:16px;height:100%;background:linear-gradient(to right,rgba(0,0,0,.3),transparent);z-index:3;pointer-events:none}
+
+/* ===== Theme backgrounds ===== */
+.pg-cover{background:linear-gradient(170deg,#0d0d0d 0%,#1a1a2e 40%,#16213e 100%);color:var(--paper)}
+.pg-dark{background:linear-gradient(180deg,#111 0%,#1a1a1a 100%);color:var(--paper)}
+.pg-paper{background:linear-gradient(135deg,#f5f0e8 0%,#ede0cc 50%,#f0e8d8 100%);color:var(--ink)}
+.pg-blood{background:linear-gradient(170deg,#1a0a0a 0%,#2a1010 50%,#3a1515 100%);color:#d4a0a0}
+.pg-blue{background:linear-gradient(160deg,#0a1525 0%,#152540 50%,#1a3050 100%);color:#c0d0e0}
+.pg-green{background:linear-gradient(160deg,#0a1a10 0%,#0d2a18 50%,#0f3a20 100%);color:#a0d0b0}
+
+/* ===== Typography ===== */
+h1{font-size:clamp(24px,5.5vw,38px);letter-spacing:clamp(3px,.5vw,6px);font-weight:700}
+h2{font-size:clamp(16px,3.5vw,24px);letter-spacing:3px;font-weight:600}
+h3{font-size:clamp(11px,2vw,14px);letter-spacing:3px;font-weight:400;text-transform:uppercase}
+.stat-label{font-size:clamp(10px,1.8vw,13px);letter-spacing:3px;opacity:.55;margin-bottom:clamp(8px,1.2vh,14px)}
+.num-huge{font-size:clamp(36px,8vw,60px);font-weight:700;line-height:1.1}
+.num-large{font-size:clamp(24px,5vw,40px);font-weight:600;line-height:1.3;letter-spacing:1px}
+.sub-label{font-size:clamp(11px,2vw,14px);opacity:.7;margin-top:4px}
+p{font-size:clamp(11px,2.2vw,15px);line-height:1.85;text-align:center;max-width:82%;letter-spacing:0.02em}
+blockquote{font-size:clamp(10px,2vw,14px);font-style:italic;text-align:center;line-height:1.8;max-width:84%;margin:clamp(8px,1.5vh,14px) 0;letter-spacing:0.03em}
+.divider{width:40px;height:2px;margin:clamp(10px,2vh,20px) auto}
+.divider-light{width:30px;height:1px;margin:clamp(6px,1vh,12px) auto;background:rgba(255,255,255,.25)}
+.divider-gold{width:50px;height:2px;margin:clamp(10px,2vh,20px) auto;background:var(--gold)}
+
+/* ===== Visual elements ===== */
+.bar-chart{display:flex;align-items:flex-end;justify-content:center;gap:clamp(4px,.8vw,8px);width:90%;height:clamp(110px,22vw,180px);margin:clamp(10px,2vh,20px) 0;position:relative}
+.bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;max-width:60px;position:relative}
+.bar{width:100%;border-radius:3px 3px 0 0;min-height:6px;position:relative}
+.bar-val{position:absolute;top:clamp(-16px,-2.5vw,-20px);font-size:clamp(8px,1.6vw,11px);font-weight:700}
+.bar-lbl{position:absolute;bottom:clamp(-14px,-2vw,-18px);font-size:clamp(7px,1.4vw,10px);white-space:nowrap;font-weight:600}
+
+.ratio-row{display:flex;align-items:center;gap:clamp(6px,1vw,12px);width:85%;margin:clamp(6px,1vh,12px) 0;padding:clamp(4px,.6vh,8px) clamp(8px,1.5vw,14px);background:rgba(0,0,0,.04);border-radius:6px}
+.ratio-row .rl{font-size:clamp(10px,1.8vw,13px);min-width:clamp(60px,12vw,80px)}
+.ratio-row .rt{flex:1;height:clamp(14px,2.5vw,20px);background:rgba(0,0,0,.08);border-radius:10px;overflow:hidden;position:relative}
+.ratio-row .rf{height:100%;border-radius:10px}
+.ratio-row .rf span{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:clamp(8px,1.4vw,10px);color:#fff;font-weight:700}
+
+.insight{width:88%;margin:clamp(6px,1vh,12px) 0;padding:clamp(8px,1.2vh,14px) clamp(10px,2vw,18px);background:rgba(201,168,76,.08);border-radius:8px;border:1px solid rgba(201,168,76,.2)}
+.insight .il{font-size:clamp(9px,1.6vw,12px);color:#b7950b;font-weight:600;letter-spacing:2px;margin-bottom:6px}
+.insight p{font-size:clamp(9px,1.8vw,13px);margin:0;max-width:100%}
+
+.timeline{display:flex;justify-content:center;gap:clamp(16px,3vw,40px);width:85%;margin:clamp(10px,2vh,20px) 0;position:relative}
+.timeline::before{content:'';position:absolute;top:6px;left:15%;right:15%;height:1px;background:rgba(255,255,255,.15)}
+.timeline-item{display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;z-index:1}
+.timeline-item .dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--gold)}
+.timeline-item .ty{font-size:clamp(9px,1.6vw,12px)}
+.timeline-item .tt{font-size:clamp(8px,1.4vw,10px);opacity:.6}
+
+.cross{font-size:clamp(20px,4vw,32px);font-family:Georgia,serif}
+
+/* ===== Scrollable content page ===== */
+.scroll-content{overflow-y:auto;width:100%;flex:1;display:flex;flex-direction:column;align-items:center;-webkit-overflow-scrolling:touch;padding:clamp(6px,1vh,10px) 0}
+
+/* ===== Responsive ===== */
+@media(min-width:660px){.book-stage{width:min(100% - 48px,480px)}.indicator{bottom:32px;padding:8px 22px}}
+@media(min-width:1024px){body{padding:32px}.book-stage{width:min(100% - 64px,520px)}.indicator{bottom:48px;padding:10px 28px;font-size:15px}}
+@media(orientation:landscape) and (max-height:500px){
+  .book-stage{width:auto;height:calc(100dvh - 40px)}.book{width:auto;height:100%}
+  .indicator{bottom:6px;padding:3px 12px;font-size:10px}
+  .bar-chart{height:80px}.num-huge{font-size:clamp(28px,5vw,40px)}
+  .insight{padding:4px 8px;margin:3px 0}
+}
+</style>
+</head>
+<body>
+
+<div class="book-stage">
+  <div class="book-shadow"></div>
+  <div class="book" id="book"></div>
+  <div class="nav-zone nav-left" id="navLeft"></div>
+  <div class="nav-zone nav-right" id="navRight"></div>
+</div>
+<div class="indicator" id="indicator">1 / 11</div>
+
+<script>
+(function(){
+var pages=[
+  // ====== 0: COVER ======
+  '<div class="pg-cover" style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:clamp(20px,4vw,40px)">'+
+    '<div style="color:var(--gold);font-size:clamp(14px,2.5vw,20px);margin-bottom:clamp(12px,2vh,24px);letter-spacing:6px">✦ ✦ ✦</div>'+
+    '<h1 style="font-size:clamp(28px,6.5vw,44px);letter-spacing:clamp(4px,1vw,8px);color:var(--gold)">十年巨变</h1>'+
+    '<div class="divider-gold"></div>'+
+    '<div style="font-size:clamp(13px,2.8vw,18px);letter-spacing:clamp(4px,.8vw,8px);color:rgba(255,255,255,.6);margin-bottom:clamp(16px,3vh,32px)">市 值 的 故 事</div>'+
+    '<div style="color:var(--gold);font-size:clamp(12px,2vw,16px);margin-bottom:clamp(20px,4vh,40px)">✦</div>'+
+    '<p style="color:rgba(255,255,255,.4);font-size:clamp(10px,1.8vw,12px);line-height:2">2015 — 2026<br>中国概念股 × 全球科技巨头</p>'+
+    '<div style="color:var(--gold);font-size:clamp(12px,2vw,16px);margin-top:clamp(16px,3vh,32px)">✦ ✦ ✦</div>'+
+    '<p style="color:rgba(255,255,255,.25);font-size:clamp(9px,1.5vw,11px);letter-spacing:2px;margin-top:clamp(8px,1.5vh,16px)">— 关于基础设施、护城河、以及范式的翻转 —</p>'+
+  '</div>',
+
+  // ====== 1: 2015 全景 ======
+  '<div class="pg-paper" style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:clamp(2px,.4vh,6px);padding:clamp(14px,3vw,36px)">'+
+    '<div class="stat-label">2015 · 十年前的风景</div>'+
+    '<div class="bar-chart">'+
+      '<div class="bar-wrap"><div class="bar-val">~1.5T</div><div class="bar" style="height:100%;background:linear-gradient(to top,#6c3483,#8e44ad)"></div><div class="bar-lbl" style="color:#5a4a3a">Apple+MS+GOOG</div></div>'+
+      '<div class="bar-wrap"><div class="bar-val">~1.5T</div><div class="bar" style="height:85%;background:linear-gradient(to top,#1a5276,#3498db)"></div><div class="bar-lbl" style="color:#5a4a3a">中概集团</div></div>'+
+      '<div class="bar-wrap"><div class="bar-val">150B</div><div class="bar" style="height:10%;background:linear-gradient(to top,#1e8449,#27ae60)"></div><div class="bar-lbl" style="color:#1e8449">NVIDIA</div></div>'+
+      '<div class="bar-wrap"><div class="bar-val">100B</div><div class="bar" style="height:7%;background:linear-gradient(to top,#922b21,#e74c3c)"></div><div class="bar-lbl" style="color:#5a4a3a">TSMC</div></div>'+
+      '<div class="bar-wrap"><div class="bar-val">~4B</div><div class="bar" style="height:1%;background:linear-gradient(to top,#b7950b,#f1c40f)"></div><div class="bar-lbl" style="color:#5a4a3a">BTC</div></div>'+
+    '</div>'+
+    '<p style="font-size:clamp(10px,2vw,13px)">苹果、微软、谷歌三座大山并肩托起~1.5万亿。<br>中概集团同样~1.5万亿——<strong>人多，但个子矮</strong>。<br><span style="opacity:.6">NVIDIA只是一个小小的注脚</span></p>'+
+    '<div class="divider" style="background:#ddd"></div>'+
+    '<div class="insight"><div class="il">💡 时代叙事</div><p>「人多力量大」——中概的黄金叙事。个体虽小，合起来就是一方势力。</p></div>'+
+  '</div>',
+
+    // ====== 2: Ariste 定理一 · 基础设施 > 应用 ======
+  '<div class="pg-paper" style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:clamp(4px,.6vh,10px);padding:clamp(14px,3vw,36px)">'+
+    '<div class="stat-label">定理一 · 基础设施大于应用</div>'+
+    '<div class="ratio-row" style="border-left:3px solid #27ae60"><span class="rl">2015 NVIDIA</span><span>150B</span><span style="flex:1;text-align:right;opacity:.5">'''+B+''' 基建层</span></div>'+
+    '<div class="ratio-row" style="border-left:3px solid #3498db"><span class="rl">2015 中概集团</span><span>~1.5T</span><span style="flex:1;text-align:right;opacity:.5">'''+B+''' 应用层</span></div>'+
+    '<p style="font-size:clamp(10px,1.8vw,13px)">2015年：应用层总市值是基建层的<strong>10倍</strong>。<br>所有人追逐"连接用户"的公司——因为看得懂。<br>没人愿意买一个卖显卡的。</p>'+
+    '<p style="font-size:clamp(10px,1.8vw,13px)">十年后：基建层（NVIDIA+TSMC+AVGO）市值<br>已经<strong>反超</strong>应用层（中概集团）。</p>'+
+    '<div class="divider" style="background:#ddd"></div>'+
+    '<div class="insight"><div class="il">'''+P+''' 投资直觉</div><p>基础设施公司在爆发前总是不性感。因为它们不直接服务用户——它们服务那些服务用户的公司。但每一轮技术革命，<strong>最大的价值都流向了最底层的那个环节</strong>。淘金热里赚钱的不是淘金者，是卖铲子的。AI热里赚钱的不是AI应用，是提供算力的。</p></div>'+
+  '</div>',
+  // ====== 3: 2021 ======
+  '<div class="pg-paper" style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:clamp(2px,.4vh,6px);padding:clamp(14px,3vw,36px)">'+
+    '<div class="stat-label">2021 · 五年后的转折</div>'+
+    '<div class="bar-chart" style="height:clamp(100px,20vw,160px)">'+
+      '<div class="bar-wrap"><div class="bar-val">~2T</div><div class="bar" style="height:100%;background:linear-gradient(to top,#6c3483,#8e44ad)"></div><div class="bar-lbl" style="color:#5a4a3a">Apple</div></div>'+
+      '<div class="bar-wrap"><div class="bar-val">~2.5T(峰值)</div><div class="bar" style="height:90%;background:linear-gradient(to top,#1a5276,#3498db)"></div><div class="bar-lbl" style="color:#5a4a3a">中概</div></div>'+
+      '<div class="bar-wrap"><div class="bar-val">500B</div><div class="bar" style="height:25%;background:linear-gradient(to top,#922b21,#e74c3c)"></div><div class="bar-lbl" style="color:#5a4a3a">TSMC</div></div>'+
+      '<div class="bar-wrap"><div class="bar-val">250B</div><div class="bar" style="height:12%;background:linear-gradient(to top,#1e8449,#27ae60)"></div><div class="bar-lbl" style="color:#1e8449">NVIDIA</div></div>'+
+    '</div>'+
+    '<p style="font-size:clamp(10px,2vw,13px)">苹果突破 <strong>2T$</strong>，成为绝对巨无霸。<br>中概到过 <strong>2.5T$</strong> 峰值——但那是顶点。</p>'+
+    '<div class="divider" style="background:#ddd"></div>'+
+    '<div class="insight"><div class="il">⚡ 技术转向</div><p>移动互联网 → 移动 + 芯片。台积电的崛起预示着一件事：<strong>算力正在变得值钱</strong>。</p></div>'+
+  '</div>',
+
+    // ====== 4: Ariste 定理二 · 看不见的护城河 ======
+  '<div class="pg-paper" style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:clamp(4px,.6vh,10px);padding:clamp(14px,3vw,36px)">'+
+    '<div class="stat-label">定理二 · 看不见的护城河</div>'+
+    '<p style="font-size:clamp(10px,1.8vw,13px)">2015到2021，NVIDIA从150B涨到250B（+67%）。<br>中概从1.5T涨到2.5T（+67%）。<br><strong>倍率完全一样</strong>。</p>'+
+    '<p style="font-size:clamp(10px,1.8vw,13px)">但这两段67%增长的本质截然不同。</p>'+
+    '<div class="insight" style="border-left:3px solid #27ae60"><div class="il" style="color:#27ae60">NVIDIA的+67%</div><p style="font-size:clamp(9px,1.8vw,12px);text-align:left">CUDA生态已经积累了近10万开发者——<br>但市场没有为此定价。<br>涨的67%只是数据中心业务的自然增长，<br>CUDA的垄断价值一分钱都没被计入。</p></div>'+
+    '<div class="insight" style="border-left:3px solid #3498db"><div class="il" style="color:#3498db">中概的+67%</div><p style="font-size:clamp(9px,1.8vw,12px);text-align:left">涨的是市场情绪和宏观条件，<br>不是底层竞争力的提升。<br>风停的时候，一切回到原点。</p></div>'+
+    '<div class="divider" style="background:#ddd"></div>'+
+    '<blockquote style="font-size:clamp(9px,1.6vw,12px);color:#8b7355"><strong>同样的涨幅，一个在筑坝，一个在冲浪。</strong><br>筑坝的人你看不懂——水面以下的工程量不可见。<br>冲浪的人看着风光——但浪总会退。</blockquote>'+
+  '</div>',
+  // ====== 5: 2026 ======
+  '<div class="pg-dark" style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:clamp(2px,.4vh,6px);padding:clamp(14px,3vw,36px)">'+
+    '<div class="stat-label">2026 · 现在的格局</div>'+
+    '<div class="bar-chart" style="height:clamp(100px,20vw,160px)">'+
+      '<div class="bar-wrap"><div class="bar-val" style="color:#2ecc71">$5.2T</div><div class="bar" style="height:100%;background:linear-gradient(to top,#1e8449,#2ecc71)"></div><div class="bar-lbl" style="color:#2ecc71">NVIDIA</div></div>'+
+      '<div class="bar-wrap"><div class="bar-val" style="color:#85c1e9">$4.7T</div><div class="bar" style="height:90%;background:linear-gradient(to top,#1a5276,#5dade2)"></div><div class="bar-lbl" style="color:rgba(255,255,255,.7)">Alphabet</div></div>'+
+      '<div class="bar-wrap"><div class="bar-val">$4.4T</div><div class="bar" style="height:85%;background:linear-gradient(to top,#6c3483,#af7ac5)"></div><div class="bar-lbl" style="color:rgba(255,255,255,.7)">Apple</div></div>'+
+      '<div class="bar-wrap"><div class="bar-val">$3.1T</div><div class="bar" style="height:60%;background:linear-gradient(to top,#2471a3,#85c1e9)"></div><div class="bar-lbl" style="color:rgba(255,255,255,.6)">MSFT</div></div>'+
+      '<div class="bar-wrap"><div class="bar-val" style="color:#aaa">~$2T</div><div class="bar" style="height:38%;background:linear-gradient(to top,#5a6a7a,#7f8c8d)"></div><div class="bar-lbl" style="color:rgba(255,255,255,.5)">中概</div></div>'+
+    '</div>'+
+    '<div class="num-large" style="color:#2ecc71;font-size:clamp(18px,4vw,28px);margin:clamp(4px,.6vh,8px) 0"><strong><span style="color:#2ecc71">NVIDIA</span> 世界第一</strong></div>'+
+    '<p style="font-size:clamp(10px,1.8vw,13px)">NVIDIA $5.2T —— 当今全球最高市值公司。<br>Alphabet $4.7T，Apple $4.55T紧随。<br>中概念计约$1.5T，十年近乎原地踏步。</p>'+
+    '<p style="font-size:clamp(8px,1.6vw,11px);color:rgba(255,255,255,.5);margin-top:clamp(4px,.6vh,6px)">📊 数据: StockTitan/MarketCapWatch · 2026-05-28 多源交叉<5%</p>'+
+  '</div>',
+
+    // ====== 6: 翻转 + 投资逻辑 ======
+  '<div class="pg-dark" style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:clamp(4px,.6vh,8px);padding:clamp(14px,3vw,36px)">'+
+    '<div class="stat-label">2015 → 2026 · 翻转的刻度</div>'+
+    '<div class="ratio-row" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)"><span class="rl" style="color:rgba(255,255,255,.7)">2015</span><div class="rt" style="background:rgba(255,255,255,.08)"><div class="rf" style="width:10%;background:#27ae60"><span>NVIDIA 1/10</span></div></div></div>'+
+    '<div class="ratio-row" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)"><span class="rl" style="color:rgba(255,255,255,.7)">2026</span><div class="rt" style="background:rgba(255,255,255,.08)"><div class="rf" style="width:100%;background:#1e8449"><span>NVIDIA 3:1</span></div></div></div>'+
+    '<p style="color:rgba(255,255,255,.7);font-size:clamp(10px,1.8vw,13px)">$150B → $5.2T = <strong style="color:#2ecc71">35倍</strong><br>$1.5T → ~$1.5T = <strong style="color:#7f8c8d">~1.3倍</strong></p>'+
+    '<div class="insight" style="background:rgba(46,204,113,.06);border:1px solid rgba(46,204,113,.2);width:88%"><div class="il" style="color:#2ecc71">'''+S+''' 投资规则</div><p style="font-size:clamp(9px,1.8vw,12px);text-align:left;color:rgba(255,255,255,.8)">35倍不需要每年都很惊艳。20-30%的底层价值增长，叠加一次估值范式切换（市场意识到"它是AI基础设施，不是卖显卡的"），35倍就这样来了。<strong>关键不是找翻倍的公司，是找被市场用错误范式定价的公司。</strong></p></div>'+
+  '</div>',
+  // ====== 7: 技术周期 ======
+  '<div class="pg-blue" style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:clamp(2px,.4vh,6px);padding:clamp(14px,3vw,36px)">'+
+    '<div class="stat-label" style="color:rgba(255,255,255,.4)">三个技术周期 · 底座在换</div>'+
+    '<div class="timeline">'+
+      '<div class="timeline-item"><div class="dot"></div><div class="ty">2015</div><div class="tt">Mobile</div></div>'+
+      '<div class="timeline-item"><div class="dot"></div><div class="ty">2021</div><div class="tt">Mobile+Chip</div></div>'+
+      '<div class="timeline-item"><div class="dot"></div><div class="ty">2026</div><div class="tt">AI Era</div></div>'+
+    '</div>'+
+    '<p style="font-size:clamp(10px,1.8vw,13px);margin:clamp(8px,1.5vh,16px) 0"><strong>2015</strong> · 移动互联网<br>苹果定义硬件，Google定义搜索。</p>'+
+    '<p style="font-size:clamp(10px,1.8vw,13px);margin:clamp(4px,.6vh,8px) 0"><strong>2021</strong> · 移动+芯片<br>台积电站到苹果旁边——造芯片的<em>和造手机的一样重要</em>。</p>'+
+    '<p style="font-size:clamp(10px,1.8vw,13px);margin:clamp(4px,.6vh,8px) 0"><strong>2026</strong> · AI算力<br>NVIDIA登顶。算力不是附加值——<strong style="color:#2ecc71">算力就是核心产品本身</strong>。</p>'+
+  '</div>',
+
+  // ====== 8: 深度分析 ======
+  '<div class="scroll-content" style="background:linear-gradient(135deg,#f5f0e8 0%,#ede0cc 50%,#f0e8d8 100%);color:var(--ink);overflow-y:auto;width:100%;height:100%;border-radius:3px;padding:clamp(20px,4vw,36px)">'+
+    '<div class="stat-label" style="color:#8b7355;text-align:center">十年之后 · 三条洞察</div>'+
+    '<p style="text-align:center;font-size:clamp(8px,1.5vw,11px);color:#8b7355;margin:clamp(4px,.6vh,8px) 0">📊 数据: StockTitan/MarketCapWatch · 2026-05-28</p>'+
+    '<div class="divider" style="background:#ddd"></div>'+
+    '<div class="insight" style="margin:clamp(8px,1.5vh,16px) 0;text-align:left">'+
+      '<div class="il">📊 数据校准 (2026-05-28)</div>'+
+      '<p style="text-align:left;font-size:clamp(9px,1.8vw,12px)"><strong>NVIDIA: $5.2T</strong> （信息图预测~$3T，低估73%）<br><strong>Alphabet: $4.7T</strong> 超越 Apple $4.55T 升至第2<br><strong>中国科技股合计: ~$1.5T</strong>（Tencent ~$510B + Alibaba ~$300B + PDD等）<br>TSMC: $2.1T 创新高 · MSFT: $3.1T · AAPL: $4.55T</p>'+
+    '</div>'+
+    '<div class="insight" style="margin:clamp(8px,1.5vh,16px) 0;text-align:left">'+
+      '<div class="il">🔍 第一层 · 谁赢了</div>'+
+      '<p style="text-align:left;font-size:clamp(9px,1.8vw,12px)">NVIDIA赢了。但这不是故事的结尾——这是故事的<strong>中间点</strong>。苹果、微软并没有消失。真正的故事是：总市值这个盘子变大了，但<strong>分蛋糕的逻辑变了</strong>——从「连接用户」变成了「提供算力」。</p>'+
+    '</div>'+
+    '<div class="insight" style="margin:clamp(8px,1.5vh,16px) 0;text-align:left">'+
+      '<div class="il">🔍 第二层 · 为什么是NVIDIA</div>'+
+      '<p style="text-align:left;font-size:clamp(9px,1.8vw,12px)">2015年没人押注NVIDIA——因为<strong>它不性感</strong>。不做手机，不做社交，不做电商。它做的是别人不想做的东西：图形卡、并行计算、CUDA生态。十年后当AI需要大规模算力时，全世界才发现：<strong>只有它准备好了</strong>。这不是运气——是在没人看见的地方默默修了十年的路。</p>'+
+    '</div>'+
+    '<div class="insight" style="margin:clamp(8px,1.5vh,16px) 0;text-align:left">'+
+      '<div class="il">🔍 第三层 · 错过的是什么</div>'+
+      '<p style="text-align:left;font-size:clamp(9px,1.8vw,12px)">中概最大的问题不是不够努力——是<strong>整个赛道变了</strong>。当全球科技从「连接人与信息」转向「连接算力与智能」时，大部分中概公司仍然在做同一件事。这不是战略错误——是<strong>心理模型过时了</strong>。你还在用旧地图，别人已经换了新大陆。</p>'+
+    '</div>'+
+    '<blockquote style="font-size:clamp(9px,1.6vw,12px);color:#8b7355;margin-top:clamp(8px,1.5vh,16px)">十年间，「疾风」吹了好几次。<br>每次风停之后，劲草都换了一批。<br><strong>不是风太不公平——是草自己去的地方不同。</strong></blockquote>'+
+  '</div>',
+
+  // ====== 9: 趋势的翻转 ======
+  '<div class="pg-dark" style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:clamp(20px,4vw,40px)">'+
+    '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center">'+
+    '<blockquote style="color:rgba(255,255,255,.8);font-size:clamp(12px,2.5vw,18px);line-height:1.8;max-width:85%">'+
+      '「趋势的翻转从来不是渐变的。<br>它只是在你没注意的时候，<br>一个人站到了所有人上面。」'+
+    '</blockquote>'+
+    '<div class="divider-light"></div>'+
+    '<p style="color:rgba(255,255,255,.5);font-size:clamp(10px,2vw,14px)">十年是一段不长不短的时间。<br>长到可以让一个小公司涨35倍成为世界第一。<br>短到可以让一个集团军兜兜转转回到原点。</p>'+
+    '<div class="divider-light"></div>'+
+    '<p style="color:rgba(255,255,255,.4);font-size:clamp(9px,1.8vw,12px);font-style:italic">那张图的残酷之处不在于NVIDIA涨了多少——<br>而在于中概集团的曲线，画了一个十年的圆。</p>'+
+    '<p style="color:rgba(255,255,255,.3);font-size:clamp(8px,1.5vw,11px);margin-top:clamp(8px,1.5vh,16px)">📊 数据: StockTitan/MarketCapWatch · 2026-05-28<br>多源交叉验证偏差&lt;2%</p>'+
+    '</div>'+
+  '</div>',
+
+  // ====== 10: BACK COVER ======
+  '<div class="pg-cover" style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:clamp(6px,1vh,14px);padding:clamp(24px,5vw,48px)">'+
+    '<div style="color:var(--gold);font-size:clamp(16px,3vw,24px);opacity:0.5">✦ ✦ ✦</div>'+
+    '<div style="flex:0.2"></div>'+
+    '<h2 style="color:var(--gold);letter-spacing:6px;font-size:clamp(28px,6vw,40px)">FIN</h2>'+
+    '<div class="divider-gold"></div>'+
+    '<div style="flex:0.2"></div>'+
+    '<p style="color:rgba(255,255,255,.5);font-size:clamp(11px,2.2vw,15px);line-height:2">十年，一张图，<br>一个翻转的世界。</p>'+
+    '<p style="color:rgba(255,255,255,.3);font-size:clamp(9px,1.6vw,12px);line-height:1.8">2015 — 2026<br>中国概念股 × 全球科技巨头的市值故事</p>'+
+    '<div style="flex:0.3"></div>'+
+    '<p style="color:rgba(255,255,255,.18);font-size:clamp(7px,1.3vw,9px);line-height:2">市值数据: StockTitan/MarketCapWatch/TradingView · 2026-05-28<br>多源交叉验证偏差&lt;5% · BTC 2015 ~$4B 已验证</p>'+
+    '<p style="color:rgba(255,255,255,.15);font-size:clamp(9px,1.5vw,12px);margin-top:clamp(4px,.6vh,8px)">Ariste 🦞</p>'+
+    '<div style="color:var(--gold);font-size:clamp(12px,2vw,16px);opacity:0.35">✦ ✦ ✦</div>'+
+  '</div>'
+];
+
+var N=pages.length, cur=0, flip=false;
+var bk=document.getElementById('book'), ind=document.getElementById('indicator');
+
+function gP(i){return bk.querySelector('.page[data-page="'+i+'"]')}
+function sP(i,z,c){var e=gP(i);if(!e)return;e.style.display='flex';e.style.zIndex=z;if(c)e.className='page '+c}
+function uI(){ind.textContent=(cur===0?'封面':cur===N-1?'封底':'第'+(cur+1)+'页')+' / '+N}
+
+function rC(){for(var i=0;i<N;i++){var e=gP(i);if(!e)continue;if(i===cur){e.style.display='flex';e.style.zIndex=2;e.style.opacity='1';e.className='page page-current'}else{e.style.display='none';e.style.opacity='0';e.className='page'}}uI()};
+function cl(){var f=bk.querySelector('.page-flipper');if(f)f.remove();var s=bk.querySelector('.curl-shadow');if(s)s.remove()}
+
+for(var i=0;i<N;i++){
+  var d=document.createElement('div');
+  d.className='page';d.setAttribute('data-page',i);
+  d.innerHTML=pages[i];
+  bk.appendChild(d);
+}
+rC();
+
+function doFlip(dst,dir){
+  if(flip||dst<0||dst>=N)return;
+  var t=dst>cur?cur:dst;
+  flip=true;
+
+  var sh=document.createElement('div');
+  sh.className='curl-shadow';sh.style.opacity='0';
+  sh.style.transition='opacity 0.5s ease';
+  bk.appendChild(sh);
+  requestAnimationFrame(function(){sh.style.opacity='1'});
+
+  var fl=document.createElement('div');
+  fl.className='page-flipper';
+  fl.style.zIndex='5';
+
+  var fr=document.createElement('div');
+  fr.className='page-front '+(dir>0?'pg-'+t:'pg-'+cur);
+  fr.innerHTML=dir>0?pages[t]:pages[cur];
+
+  var ba=document.createElement('div');
+  ba.className='page-back '+(dir>0?'pg-'+cur:'pg-'+t);
+  ba.innerHTML=dir>0?pages[dst]:pages[t];
+
+  fl.appendChild(fr);fl.appendChild(ba);
+  bk.appendChild(fl);
+
+  var r=dir>0?-180:0;
+  requestAnimationFrame(function(){
+    fl.style.transition='transform 0.7s cubic-bezier(0.15,0.7,0.3,1)';
+    fl.style.transform='rotateY('+r+'deg)';
+  });
+
+  fl.addEventListener('transitionend',function fn(){fl.removeEventListener('transitionend',fn);cur=dst;var pe=gP(cur);if(pe){pe.style.display='flex';pe.style.zIndex=10}cl();rC();flip=false});setTimeout(function(){if(flip){cur=dst;var pe=gP(cur);if(pe){pe.style.display='flex';pe.style.zIndex=10}cl();rC();flip=false}},900);
+}
+
+function next(){doFlip(cur+1,1)}
+function prev(){doFlip(cur-1,-1)}
+
+document.getElementById('navRight').addEventListener('click',next);
+document.getElementById('navLeft').addEventListener('click',prev);
+document.addEventListener('keydown',function(e){
+  if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' ')e.preventDefault(),next();
+  else if(e.key==='ArrowLeft'||e.key==='ArrowUp')e.preventDefault(),prev();
+});
+
+var tx=0,sw=false;
+document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX;sw=true},{passive:true});
+document.addEventListener('touchmove',function(e){if(sw)e.preventDefault()},{passive:false});
+document.addEventListener('touchend',function(e){
+  if(!sw)return;sw=false;
+  var dx=e.changedTouches[0].clientX-tx;
+  if(Math.abs(dx)>30){if(dx<0)next();else prev()}
+});
+
+})();
+</script>
+</body>
+</html>
