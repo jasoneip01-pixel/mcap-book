@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>段永平的十年之问 · 一张图背后的投资哲学</title>
+<style>
+:root {
+  --bg: #1a1a1f;
+  --page-bg: #f5f0e8;
+  --text: #2c2416;
+  --text-muted: #5c5242;
+  --accent: #8b4513;
+  --accent-light: #c4783e;
+  --shadow: rgba(0,0,0,0.35);
+  --flip-duration: 0.65s;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  font-family: 'Georgia', 'Noto Serif SC', 'STSong', 'Songti SC', 'PingFang SC', 'Microsoft YaHei', serif;
+  display: flex; justify-content: center; align-items: center;
+  min-height: 100vh; min-height: 100dvh;
+  overflow: hidden;
+  user-select: none; -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  perspective: 1800px;
+}
+
+/* ── Book stage ── */
+.book-stage {
+  position: relative;
+  /* Page fills most of viewport, with book-like proportions */
+  width: min(88vw, 620px);
+  height: min(88vh, 820px);
+  height: min(88dvh, 820px);
+}
+
+/* ── Page cards ── */
+.flip-page {
+  position: absolute;
+  width: 100%; height: 100%;
+  background: var(--page-bg);
+  border-radius: 3px 6px 6px 3px;
+  box-shadow:
+    2px 0 12px rgba(0,0,0,0.08),
+    4px 0 28px rgba(0,0,0,0.18);
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  overflow: hidden;
+  cursor: pointer;
+  z-index: 1;
+  transition: transform var(--flip-duration) cubic-bezier(0.55, 0.06, 0.35, 0.94);
+  will-change: transform;
+}
+
+/* Right edge shadow — simulates page thickness */
+.flip-page::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: 8px;
+  background: linear-gradient(to left, rgba(0,0,0,0.06), transparent);
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* Flipped state — rotated around left edge */
+.flip-page.flipped {
+  transform: rotateY(-180deg);
+  z-index: 0;
+  box-shadow:
+    -2px 0 12px rgba(0,0,0,0.08),
+    -4px 0 28px rgba(0,0,0,0.18);
+}
+
+/* The page being actively flipped (highest z-index) */
+.flip-page.front {
+  z-index: 10;
+}
+
+/* Page behind the current one */
+.flip-page.behind {
+  z-index: 0;
+  transform: rotateY(0deg);
+}
+
+/* ── Page inner content ── */
+.page-inner {
+  padding: 5% 6%;
+  height: 100%;
+  display: flex; flex-direction: column;
+  position: relative;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.page-num {
+  position: absolute;
+  bottom: 16px; right: 20px;
+  font-size: 11px;
+  color: var(--text-muted);
+  opacity: 0.4;
+}
+
+/* ── Typography ── */
+.page-inner h1 {
+  font-size: clamp(17px, 2.5vw, 22px);
+  color: var(--accent);
+  margin-bottom: 14px;
+  line-height: 1.45;
+  font-weight: normal;
+  letter-spacing: 0.3px;
+}
+
+.page-inner h2 {
+  font-size: clamp(14px, 2vw, 17px);
+  color: var(--accent);
+  margin: 16px 0 8px;
+  font-weight: normal;
+}
+
+.page-inner p {
+  font-size: clamp(13px, 1.8vw, 15px);
+  line-height: 1.85;
+  color: var(--text);
+  margin-bottom: 10px;
+  text-indent: 2em;
+}
+
+.page-inner p.no-indent { text-indent: 0; }
+
+.page-inner .quote {
+  border-left: 3px solid var(--accent);
+  padding-left: 14px;
+  margin: 12px 0;
+  color: var(--accent);
+  font-style: italic;
+  font-size: clamp(13px, 1.8vw, 15px);
+}
+
+.page-inner .highlight {
+  color: var(--accent);
+  font-weight: bold;
+}
+
+.page-inner .small {
+  font-size: clamp(11px, 1.5vw, 13px);
+  color: var(--text-muted);
+}
+
+/* ── Cover page ── */
+.cover-bg {
+  background: linear-gradient(150deg, #2c1810 0%, #4a2c17 35%, #5e321f 60%, #3d1f0f 100%);
+  color: #f5e6d3;
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  text-align: center;
+  padding: 10%;
+}
+
+.cover-bg h1 {
+  font-size: clamp(22px, 3.5vw, 30px);
+  color: #e8c97a;
+  margin-bottom: 14px;
+  letter-spacing: 2px;
+}
+
+.cover-bg .subtitle {
+  font-size: clamp(13px, 1.8vw, 15px);
+  color: #c8a86e;
+  margin-bottom: 28px;
+}
+
+.cover-bg .author {
+  font-size: clamp(11px, 1.5vw, 13px);
+  color: #a08060;
+  margin-top: 36px;
+}
+
+/* ── Back cover ── */
+.back-bg {
+  background: linear-gradient(150deg, #2c1810 0%, #4a2c17 35%, #5e321f 60%, #3d1f0f 100%);
+  color: #f5e6d3;
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  text-align: center;
+  padding: 10%;
+}
+
+.back-bg h2 {
+  font-size: clamp(17px, 2.5vw, 22px);
+  color: #e8c97a;
+  margin-bottom: 18px;
+  font-weight: normal;
+}
+
+.back-bg .final-quote {
+  font-size: clamp(15px, 2.2vw, 19px);
+  color: #c8a86e;
+  line-height: 1.8;
+  max-width: 80%;
+  font-style: italic;
+}
+
+/* ── Chart ── */
+.chart-section { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+.chart-row {
+  display: flex; align-items: center;
+  margin: 7px 0; gap: 10px;
+  font-size: clamp(11px, 1.6vw, 13px);
+}
+.chart-label {
+  width: clamp(56px, 10vw, 72px);
+  text-align: right;
+  color: var(--text-muted);
+  font-size: clamp(10px, 1.4vw, 12px);
+  flex-shrink: 0;
+}
+.chart-bar {
+  height: clamp(13px, 2vw, 17px);
+  border-radius: 2px;
+  position: relative; transition: width 0.6s;
+  min-width: 48px;
+  display: flex; align-items: center;
+  padding-left: 8px;
+  font-size: clamp(9px, 1.3vw, 11px);
+  color: #fff; font-weight: bold;
+}
+.chart-bar.nvidia  { background: #76b900; }
+.chart-bar.apple   { background: #555; }
+.chart-bar.china   { background: #e74c3c; }
+.chart-bar.bitcoin { background: #f7931a; }
+.chart-era {
+  text-align: center;
+  font-size: clamp(11px, 1.5vw, 13px);
+  color: var(--accent);
+  margin: 10px 0 2px;
+  font-weight: bold;
+}
+
+/* ── Positions grid ── */
+.positions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px; margin: 8px 0;
+}
+.position-card {
+  background: white;
+  padding: 11px 14px;
+  border-radius: 4px;
+  font-size: clamp(12px, 1.6vw, 13px);
+  border-left: 3px solid var(--accent);
+}
+.position-card .name {
+  font-weight: bold; color: var(--accent);
+  display: block; margin-bottom: 3px;
+}
+.position-card .reason {
+  color: var(--text); font-size: clamp(11px, 1.4vw, 12px);
+  line-height: 1.5;
+}
+
+/* ── List ── */
+.page-inner ul {
+  list-style: none; padding: 0; margin: 10px 0;
+}
+.page-inner ul li {
+  font-size: clamp(12px, 1.7vw, 14px);
+  line-height: 1.75; color: var(--text);
+  padding: 3px 0 3px 20px;
+  position: relative;
+}
+.page-inner ul li::before {
+  content: "—";
+  position: absolute; left: 0;
+  color: var(--accent-light);
+}
+
+/* ── Divider ── */
+.divider {
+  text-align: center; color: var(--accent-light);
+  margin: 10px 0; font-size: clamp(13px, 2vw, 16px);
+}
+
+/* ── Page indicator (top) ── */
+.page-indicator {
+  position: fixed;
+  bottom: max(14px, env(safe-area-inset-bottom, 14px));
+  left: 50%; transform: translateX(-50%);
+  color: #777; font-size: clamp(10px, 1.4vw, 12px);
+  z-index: 100;
+  background: rgba(26,26,31,0.7);
+  padding: 4px 14px; border-radius: 10px;
+  white-space: nowrap;
+}
+
+/* ── Tap zones (invisible) ── */
+.tap-left, .tap-right {
+  position: absolute; top: 0; bottom: 0;
+  width: 40%; z-index: 8;
+}
+.tap-left  { left: 0; }
+.tap-right { right: 0; }
+
+/* ── Responsive book sizing ── */
+@media (min-width: 768px) {
+  .book-stage {
+    width: min(75vw, 560px);
+    height: min(84vh, 780px);
+    height: min(84dvh, 780px);
+  }
+}
+
+@media (min-width: 1024px) {
+  .book-stage {
+    width: min(58vw, 540px);
+    height: min(82vh, 800px);
+    height: min(82dvh, 800px);
+  }
+}
+
+@media (min-width: 1440px) {
+  .book-stage {
+    width: min(46vw, 580px);
+    height: min(80vh, 840px);
+    height: min(80dvh, 840px);
+  }
+}
+
+/* Landscape phone — wider but shorter */
+@media (max-width: 767px) and (orientation: landscape) {
+  .book-stage {
+    width: min(80vw, 480px);
+    height: min(90vh, 400px);
+    height: min(90dvh, 400px);
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="page-indicator" id="pageInfo">第 1 / 17 页</div>
+
+<div class="book-stage" id="bookStage">
+  <!-- Pages rendered by JS -->
+  <div class="tap-left" id="tapLeft"></div>
+  <div class="tap-right" id="tapRight"></div>
+</div>
+
+
+<script>
+// ── Page data ──
+const PAGES = [
+  { id:'cover' },
+  { id:'chart1' },
+  { id:'chart2' },
+  { id:'page1' },
+  { id:'page2' },
+  { id:'page3' },
+  { id:'page4' },
+  { id:'page5' },
+  { id:'page6' },
+  { id:'page7' },
+  { id:'page8' },
+  { id:'page9' },
+  { id:'page10' },
+  { id:'page11' },
+  { id:'page12' },
+  { id:'page13' },
+  { id:'back' },
+];
+
+// ── Content ──
+function pageHTML(id) {
+  const S = (cls) => `<div class="${cls}">`;
+  const E = '</div>';
+  const H1 = (t, sz) => `<h1${sz?' style="font-size:'+sz+'"':''}>${t}</h1>`;
+  const H2 = (t) => `<h2>${t}</h2>`;
+  const P = (t, cl) => `<p${cl?' class="'+cl+'"':''}>${t}</p>`;
+  const Q = (t) => `<div class="quote">${t}</div>`;
+  const HL = (t) => `<span class="highlight">${t}</span>`;
+  const PN = (n) => `<div class="page-num">${n}</div>`;
+  const DIV = '<div class="divider">— ◆ —</div>';
+  const LI = (t) => `<li>${t}</li>`;
+
+  const pages = {
+    cover:
+      `<div class="page-inner cover-bg">
+        <h1>十年之问</h1>
+        <div class="subtitle">一张图背后的投资哲学</div>
+        <div style="font-size:13px;color:#a08060;line-height:2;">
+          以段永平的口吻，<br>讲述他的框架、他的选择、他的问题
+        </div>
+        <div class="author">— Ariste 整理 · 2026.05</div>
+      </div>`,
+
+    chart1:
+      `<div class="page-inner">
+        ${H1('一张图 · 三个时间切片','17px')}
+        <div class="chart-section">
+          <div class="chart-era">📱 2015 · 移动互联网巅峰</div>
+          <div class="chart-row"><span class="chart-label">英伟达</span><div class="chart-bar nvidia" style="width:12%;">~150亿</div></div>
+          <div class="chart-row"><span class="chart-label">苹果</span><div class="chart-bar apple" style="width:60%;">~7500亿</div></div>
+          <div class="chart-row"><span class="chart-label">中概股</span><div class="chart-bar china" style="width:110%;">≈10× 英伟达</div></div>
+          <div class="chart-era">📱+🔧 2021 · 移动+芯片并行</div>
+          <div class="chart-row"><span class="chart-label">苹果</span><div class="chart-bar apple" style="width:150%;">~2万亿</div></div>
+          <div class="chart-row"><span class="chart-label">中概股</span><div class="chart-bar china" style="width:185%;">峰值~2.5万亿</div></div>
+          <p class="small" style="margin-top:12px;text-indent:0;">BAT巅峰 + 互联网平台化浪潮</p>
+        </div>
+        ${PN(1)}
+      </div>`,
+
+    chart2:
+      `<div class="page-inner">
+        ${H1('一张图 · 三个时间切片','17px')}
+        <div class="chart-section">
+          <div class="chart-era">🤖 2026 · AI算力时代</div>
+          <div class="chart-row"><span class="chart-label">英伟达</span><div class="chart-bar nvidia" style="width:100%;">~5万亿</div></div>
+          <div class="chart-row"><span class="chart-label">苹果</span><div class="chart-bar apple" style="width:90%;">~4.5万亿</div></div>
+          <div class="chart-row"><span class="chart-label">比特币</span><div class="chart-bar bitcoin" style="width:40%;">~2万亿</div></div>
+          <div class="chart-row"><span class="chart-label">中概股</span><div class="chart-bar china" style="width:20%;">~1万亿</div></div>
+          <p class="small" style="margin-top:12px;text-indent:0;">
+            11年 → 英伟达 150亿→5万亿，300倍<br>
+            中概股 10×英伟达 → 英伟达 1/5<br>
+            比特币 = 2× 中概股整体
+          </p>
+        </div>
+        ${PN(2)}
+      </div>`,
+
+    page1:
+      `<div class="page-inner">
+        ${H1('"这图不是给我看的。"')}
+        ${P('我不会否认数据。但<span class="highlight">这张图把不同轨道上的公司放在同一张纸上了。</span>')}
+        ${P('2015年的英伟达、苹果、中概——护城河完全不同，未来十年现金流折现的逻辑完全不同。把市值放在一起，除了让你焦虑，没有投资决策价值。')}
+        ${Q('"我不会因为中概从2.5T跌到1T就觉得它便宜。估值锚不是历史峰值。"')}
+        ${P('真正的问题是：'+HL('哪一家公司十年后还在，而且比今天赚更多钱？'))}
+        ${PN(3)}
+      </div>`,
+
+    page2:
+      `<div class="page-inner">
+        ${H1('护城河不需要重挖')}
+        ${P('茅台不需要每年重新证明赤水河是真的。')}
+        ${P('苹果不需要每年重新说服用户 iOS 比 Android 好用。')}
+        ${P('英伟达不需要每年重新让开发者离开 CUDA。')}
+        ${Q('护城河是"别人知道你赚钱但没法复制"——不是专利、不是先发优势，是切换成本和生态锁定。')}
+        ${P('好公司的护城河是地质学级别的——赤水河不会改道，CUDA 上几百万开发者的代码不会重写。这才是 '+HL('"十年后还在"')+' 的底气。')}
+        ${PN(4)}
+      </div>`,
+
+    page3:
+      `<div class="page-inner">
+        ${H1('利润之上有追求')}
+        ${P('好公司不只为钱。苹果做产品不是为了利润最大化——它是利润最大化的'+HL('结果')+'。')}
+        ${P('黄峥做拼多多不是因为电商能赚钱，是他觉得这件事值得做。')}
+        ${P('这种公司不会为了季度报表砍研发、砍品质、杀鸡取卵。决策尺度是十年，不是三个月的财报季。')}
+        ${Q('做对的事情，然后把事情做对。对的事情，利润会自然跟上。')}
+        ${PN(5)}
+      </div>`,
+
+    page4:
+      `<div class="page-inner">
+        ${H1('企业文化让蠢事做不成')}
+        ${P('好的企业文化不是告诉员工做什么——是让错误的事情'+HL('根本通不过')+'。')}
+        ${P('最难量化，但最重要。一家公司能不能在关键时刻不做蠢事——盲目扩张、追逐热点、用短期利润换长期根基——决定十年后还在不在。')}
+        ${Q('企业文化是地基。地基歪了，楼再高也会倒。')}
+        ${P('护城河、追求、文化——不是 checklist。过得了这三关，十年后大概率还在。过不了的，涨了多少倍我都不碰。')}
+        ${PN(6)}
+      </div>`,
+
+    page5:
+      `<div class="page-inner">
+        ${H1('他的仓位，已经替他回答了','16px')}
+        <div class="positions">
+          <div class="position-card"><span class="name">🟢 英伟达</span><span class="reason">CUDA生态锁住AI开发者 · 2026Q1加仓至1384万股 · 占仓位12%，第三大持仓</span></div>
+          <div class="position-card"><span class="name">🍎 苹果</span><span class="reason">最深消费生态护城河 · 2011年3000亿时买入 · 十年后不会消失的复利机器</span></div>
+          <div class="position-card"><span class="name">📦 拼多多</span><span class="reason">投黄峥，不投中概赛道 · TEMU→全球电商基础设施 · 从利基长成基础设施</span></div>
+          <div class="position-card"><span class="name">🍶 茅台</span><span class="reason">赤水河不会改道 · 重要场合不会不喝茅台 · 地质学级别的护城河</span></div>
+          <div class="position-card"><span class="name">🫧 泡泡玛特</span><span class="reason">IP全球化→文化绑定 · 跟当年买苹果一个思路——不是买产品，是买文化</span></div>
+        </div>
+        ${PN(7)}
+      </div>`,
+
+    page6:
+      `<div class="page-inner">
+        ${H1('英伟达 · 5万亿，为什么还加仓？','16px')}
+        ${P('最反直觉。英伟达已经5万亿，还在加——为什么？')}
+        ${P('框架很简单：'+HL('现金流的折现。'))}
+        ${P('2026Q1 数据中心营收816亿美元，同比+92%。Q2指引910亿。全年3500亿+营收。')}
+        ${P('PE扣掉现金后'+HL('不到20倍')+'——对年增92%的公司，这不贵。')}
+        ${Q('CUDA生态锁住了AI时代的基础设施——开发者已经在上面了。这和iOS是一样的道理。')}
+        ${P('苹果2011年PE 10倍我买了。英伟达2026年PE不到20倍、每年翻倍——同一个逻辑。')}
+        ${PN(8)}
+      </div>`,
+
+    page7:
+      `<div class="page-inner">
+        ${H1('四家公司，四个逻辑','15px')}
+        <ul>
+          ${LI(HL('苹果')+'：最深消费生态护城河。不指望翻300倍，但不会消失。')}
+          ${LI(HL('拼多多')+'：不买中概赛道，买黄峥。TEMU→全球电商基础设施。从利基长成基础设施——这个轨迹我见过。')}
+          ${LI(HL('茅台')+'：赤水河不会改道，重要场合不会不喝。地质学级护城河。')}
+          ${LI(HL('泡泡玛特')+'：IP全球化最新押注。跟买苹果一样——不是买产品，是买"文化绑定"。')}
+        </ul>
+        ${Q('买股票就是买公司。公司好不好不看市值涨跌，看十年后现金流。')}
+        ${PN(9)}
+      </div>`,
+
+    page8:
+      `<div class="page-inner">
+        ${H1('投资案例 · 网易','16px')}
+        ${P(HL('2001年')+' · 0.8美元买入','no-indent')}
+        ${P('互联网泡沫破裂，网易退市边缘。市场画的线：0.8美元，快破产了。')}
+        ${P('我画的线：'+HL('每股现金2美元')+'——账上现金比股价高一倍多。丁磊这个人，我相信他能做出好游戏。')}
+        ${P('结果：'+HL('150倍回报')+'。')}
+        ${DIV}
+        ${H1('投资案例 · 茅台','16px')}
+        ${P(HL('2013年')+' · 塑化剂事件后买入','no-indent')}
+        ${P('市场恐慌："白酒完了。"')}
+        ${P('我看到：赤水河还在、中国人还在喝酒、茅台还是那瓶茅台。市场恐慌和我的判断之间，有一条巨大的裂缝。')}
+        ${PN(10)}
+      </div>`,
+
+    page9:
+      `<div class="page-inner">
+        ${H1('投资案例 · 苹果','16px')}
+        ${P(HL('2011年')+' · 3000亿市值时买入','no-indent')}
+        ${P('市场说："手机红海，护城河挡不住三星。"')}
+        ${P('我看到：iOS生态已锁住开发者，切换成本让用户不会走。市场给10倍PE，荒谬。')}
+        ${DIV}
+        ${H1('投资案例 · 拼多多','16px')}
+        ${P(HL('中概股暴跌时')+' · 持续看好','no-indent')}
+        ${P('经历40%下跌仍持有。信的不是"中概回弹"——信的是黄峥这个人。')}
+        ${P('结果：涨了'+HL('3倍')+'。')}
+        ${PN(11)}
+      </div>`,
+
+    page10:
+      `<div class="page-inner">
+        ${H1('"碰撞"的本质')}
+        ${P('碰撞不是去市场上"找"机会——机会是市场犯错时主动递给你的。')}
+        ${Q('你的全部工作，就是在市场犯错之前，已经画好了自己的那根线。')}
+        ${H2('第一张图：你画的"值多少"')}
+        ${P('花几百个小时读年报、招股书、竞争格局、管理层发言。算出：十年后现金流折回来，值多少钱。这根线跟股价无关。')}
+        ${H2('第二张图：市场在恐慌什么')}
+        ${P('塑化剂时的茅台、2011年的苹果、2022年的英伟达——市场每次都给出"看似合理"的恐慌理由。但你的线会告诉你：'+HL('它被低估了。'))}
+        ${PN(12)}
+      </div>`,
+
+    page11:
+      `<div class="page-inner">
+        ${H1('等分歧，不等共识')}
+        ${Q('共识 = 价格已反映。分歧才是定价错误的地方。')}
+        ${P('2021年中概2.5T——贪婪共识。2026年中概1T——有分歧，有定价错误，有公司被冤枉了。')}
+        ${P('但我不买"中概回弹"，'+HL('一家一家拆')+'——拼多多被冤枉，阿里有自己问题，京东另种故事。分歧里每个标的都值得单独判断。')}
+        ${H2('缩小范围，加深深度')}
+        ${P('不看500家公司，看5家。懂一家比浮光掠影看一百家有用。能力圈不是越大越好，是越深越好。')}
+        ${Q('"我不在乎错过，我在乎做错。"')}
+        ${PN(13)}
+      </div>`,
+
+    page12:
+      `<div class="page-inner">
+        ${H1('"如果你不想持有十年……"')}
+        ${P('这句话的真正用法不是拿十年——是'+HL('帮你提前淘汰99%的"机会"')+'。')}
+        ${P('看到一个机会，问自己：我敢持有十年吗？')}
+        ${P('答案不是毫不犹豫的"敢"——那就不是机会，是噪音。这个过滤器残酷但高效。')}
+        ${H2('碰撞的三个变量')}
+        <ul>
+          ${LI('你画的线和市场画的线之间的'+HL('裂缝'))}
+          ${LI('你敢不敢'+HL('下重注'))}
+          ${LI('你能'+HL('等多久'))}
+        </ul>
+        ${P('三个缺一个，碰撞就不会发生。有裂缝但不敢下注——看了个热闹。敢下注但等不了——抄底在半山腰。')}
+        ${PN(14)}
+      </div>`,
+
+    page13:
+      `<div class="page-inner">
+        ${H1('他的建议 · 不是买什么，是怎么想','15px')}
+        <ul>
+          ${LI(HL('不买赛道买公司。')+'中概2.5T→1T不等于便宜——拆开算。')}
+          ${LI(HL('不懂不碰。')+'比特币2T超过中概，我不关心。不是能力圈。')}
+          ${LI(HL('便宜与否不看历史股价。')+'锚不是2021年峰值，是十年现金流vs今天价。')}
+          ${LI(HL('持有时长决定一切。')+'愿意持有十年，你对"贵不贵"的判断会完全不同。')}
+        </ul>
+        ${Q('十年后谁还在——不是猜的，是一个公司一个公司看出来的。每个10倍股十年前都有人觉得贵。区别不是谁更聪明，是谁真的读懂了，然后拿住了。')}
+        ${P('然后我会问你：'+HL('你现在愿意花多少时间，去真正读懂一家公司？'))}
+        ${PN(15)}
+      </div>`,
+
+    back:
+      `<div class="page-inner back-bg">
+        <h2>风不公平吗？</h2>
+        <div class="final-quote">"不是市场在变——<br>是真正涨了300倍的那家公司，<br>做对了该做的事。"</div>
+        <div style="margin-top:30px; font-size:13px; color:#a08060; line-height:2;">
+          段永平的十年之问<br>整理于 2026年5月<br><br>Ariste
+        </div>
+      </div>`
+  };
+
+  return pages[id] || '';
+}
+
+// ── Flip engine ──
+let currentPage = 0;
+let isFlipping = false;
+const stage = document.getElementById('bookStage');
+
+function render() {
+  // Clear all but tap zones
+  const tapLeft = document.getElementById('tapLeft');
+  const tapRight = document.getElementById('tapRight');
+  stage.innerHTML = '';
+  stage.appendChild(tapLeft);
+  stage.appendChild(tapRight);
+
+  const total = PAGES.length;
+
+  for (let i = 0; i < total; i++) {
+    const el = document.createElement('div');
+    el.className = 'flip-page';
+
+    if (i < currentPage) {
+      // Pages before current: flipped away (hidden behind)
+      el.classList.add('flipped');
+    } else if (i === currentPage) {
+      // Current page: front and center
+      el.classList.add('front');
+    } else {
+      // Pages after current: behind
+      el.classList.add('behind');
+    }
+
+    el.innerHTML = pageHTML(PAGES[i].id);
+    el.dataset.index = i;
+    stage.appendChild(el);
+  }
+
+  updateInfo();
+}
+
+function flip(dir) {
+  if (isFlipping) return;
+  const target = currentPage + dir;
+  if (target < 0 || target >= PAGES.length) return;
+
+  isFlipping = true;
+
+  if (dir > 0) {
+    // Forward: current page flips away to the left
+    const cur = stage.querySelector(`.flip-page[data-index="${currentPage}"]`);
+    const nxt = stage.querySelector(`.flip-page[data-index="${target}"]`);
+
+    if (cur) {
+      cur.classList.remove('front');
+      cur.classList.add('flipped');
+    }
+    if (nxt) {
+      nxt.classList.remove('behind');
+      nxt.classList.add('front');
+    }
+
+    currentPage = target;
+  } else {
+    // Backward: previous page flips back from left
+    const prev = stage.querySelector(`.flip-page[data-index="${target}"]`);
+    const cur = stage.querySelector(`.flip-page[data-index="${currentPage}"]`);
+
+    if (prev) {
+      prev.classList.remove('flipped');
+      prev.classList.add('front');
+    }
+    if (cur) {
+      cur.classList.remove('front');
+      cur.classList.add('behind');
+    }
+
+    currentPage = target;
+  }
+
+  updateInfo();
+
+  setTimeout(() => { isFlipping = false; }, 700);
+}
+
+function goToPage(idx) {
+  if (isFlipping || idx === currentPage || idx < 0 || idx >= PAGES.length) return;
+
+  // Jump: rebuild from scratch
+  currentPage = idx;
+  isFlipping = true;
+  render();
+  setTimeout(() => { isFlipping = false; }, 100);
+}
+
+function updateInfo() {
+  document.getElementById('pageInfo').textContent =
+    `第 ${currentPage + 1} / ${PAGES.length} 页`;
+}
+
+// ── Controls ──
+
+
+document.getElementById('tapLeft').addEventListener('click', () => flip(-1));
+document.getElementById('tapRight').addEventListener('click', () => flip(1));
+
+// Keyboard
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') flip(1);
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') flip(-1);
+  if (e.key === 'Home') goToPage(0);
+  if (e.key === 'End') goToPage(PAGES.length - 1);
+});
+
+// Touch swipe
+let touchX = 0, touchY = 0;
+document.addEventListener('touchstart', (e) => {
+  touchX = e.touches[0].clientX;
+  touchY = e.touches[0].clientY;
+}, { passive: true });
+
+document.addEventListener('touchend', (e) => {
+  const dx = touchX - e.changedTouches[0].clientX;
+  const dy = touchY - e.changedTouches[0].clientY;
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 35) {
+    flip(dx > 0 ? 1 : -1);
+  }
+}, { passive: true });
+
+// Init
+render();
+</script>
+</body>
+</html>

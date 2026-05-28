@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>十年之问 · 段永平的投资哲学</title>
+<style>
+:root{--bg:#0a0a0a;--paper:#f5f0e8;--ink:#1a1a1a;--gold:#d4a017;--accent:#8b4513;--deep:#1a0f08}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);display:flex;justify-content:center;align-items:center;min-height:100dvh;padding:12px;font-family:Georgia,'Noto Serif SC','Source Han Serif SC',serif;user-select:none;touch-action:none}
+.book-stage{perspective:2200px;width:min(100% - 24px,420px);position:relative;display:flex;justify-content:center}
+.book-shadow{position:absolute;bottom:-10px;left:6%;width:88%;height:28px;background:radial-gradient(ellipse at center,rgba(0,0,0,.4) 0%,transparent 70%);filter:blur(12px);pointer-events:none;z-index:0}
+.book{position:relative;width:100%;aspect-ratio:3/4;transform-style:preserve-3d;z-index:1}
+.page{position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden;border-radius:3px}
+.page-current{z-index:2;filter:drop-shadow(0 4px 16px rgba(0,0,0,.35))}
+.page-underneath{z-index:1}
+.page-flipper{position:absolute;top:0;left:0;width:100%;height:100%;z-index:4;transform-style:preserve-3d;transform-origin:left center;pointer-events:none;will-change:transform}
+.page-flipper .page-front,.page-flipper .page-back{position:absolute;top:0;left:0;width:100%;height:100%;backface-visibility:hidden;overflow:hidden}
+.page-flipper .page-back{transform:rotateY(180deg);background:linear-gradient(135deg,#1a1a1a 0%,#2a2a2a 50%,#1a1a1a 100%)}
+.nav-zone{position:absolute;top:0;height:100%;width:35%;z-index:10;cursor:pointer}
+.nav-left{left:0}.nav-right{right:0}
+.indicator{position:fixed;bottom:clamp(20px,3.5vh,36px);left:50%;transform:translateX(-50%);background:rgba(0,0,0,.7);color:rgba(255,255,255,.85);padding:6px 18px;border-radius:16px;font-size:clamp(11px,2vw,14px);z-index:20;backdrop-filter:blur(10px);pointer-events:none;font-family:-apple-system,'PingFang SC',sans-serif;transition:opacity .3s}
+.curl-shadow{position:absolute;top:0;left:-8px;width:16px;height:100%;background:linear-gradient(to right,rgba(0,0,0,.3),transparent);z-index:3;pointer-events:none}
+
+/* Page themes */
+.pg-cover{background:linear-gradient(170deg,#0a0a0a 0%,#1a0a05 30%,#2a1508 60%,#0a0a0a 100%);color:var(--paper)}
+.pg-dark{background:linear-gradient(180deg,#111 0%,#1a1a1a 100%);color:var(--paper)}
+.pg-paper{background:linear-gradient(135deg,#f5f0e8 0%,#ede0cc 50%,#f0e8d8 100%);color:var(--ink)}
+.pg-accent{background:linear-gradient(170deg,#1a0805 0%,#2a0f08 50%,#3a150a 100%);color:#e0c0b0}
+.pg-gold{background:linear-gradient(160deg,#0a0a05 0%,#1a1505 50%,#2a1a05 100%);color:#e0d0a0}
+.pg-warm{background:linear-gradient(135deg,#faf6ee 0%,#f2e8d8 50%,#e8dcc8 100%);color:var(--ink)}
+
+/* Typography */
+h1{font-size:clamp(22px,5vw,34px);letter-spacing:clamp(3px,.5vw,6px);font-weight:700}
+h2{font-size:clamp(15px,3vw,22px);letter-spacing:2px;font-weight:600}
+.stat-label{font-size:clamp(10px,1.8vw,13px);letter-spacing:3px;opacity:.55;margin-bottom:clamp(8px,1.2vh,14px)}
+p{font-size:clamp(10px,2vw,14px);line-height:1.85;text-align:center;max-width:85%;letter-spacing:.02em}
+p.left{text-align:left;max-width:88%}
+blockquote{font-size:clamp(10px,2vw,14px);font-style:italic;text-align:center;line-height:1.8;max-width:84%;margin:clamp(8px,1.5vh,14px) 0;letter-spacing:.03em}
+.divider{width:40px;height:2px;margin:clamp(10px,2vh,20px) auto}
+.divider-light{width:30px;height:1px;margin:clamp(6px,1vh,12px) auto;background:rgba(255,255,255,.25)}
+.divider-gold{width:50px;height:2px;margin:clamp(10px,2vh,20px) auto;background:var(--gold)}
+.divider-accent{width:50px;height:2px;margin:clamp(10px,2vh,20px) auto;background:var(--accent)}
+
+.insight{width:88%;margin:clamp(5px,.8vh,10px) 0;padding:clamp(8px,1.2vh,14px) clamp(10px,2vw,18px);border-radius:8px}
+.insight .il{font-size:clamp(9px,1.6vw,12px);color:var(--gold);font-weight:600;letter-spacing:2px;margin-bottom:5px}
+.insight p{font-size:clamp(9px,1.7vw,12px);margin:0;max-width:100%}
+
+.chart-row{display:flex;align-items:center;margin:5px 0;gap:8px;width:88%}
+.chart-label{width:64px;text-align:right;font-size:clamp(9px,1.4vw,11px);opacity:.6;flex-shrink:0}
+.chart-bar{height:14px;border-radius:2px;display:flex;align-items:center;padding-left:8px;font-size:clamp(8px,1.2vw,10px);color:#fff;font-weight:bold;transition:width 0.6s}
+.chart-nv{background:#76b900}.chart-ap{background:#888}.chart-cn{background:#e74c3c}.chart-bt{background:#f7931a}
+
+.pos-card{width:88%;margin:4px 0;padding:clamp(8px,1vh,12px) clamp(10px,2vw,16px);border-radius:6px;text-align:left}
+.pos-card .pn{font-weight:700;color:var(--gold);font-size:clamp(10px,1.7vw,13px);display:block;margin-bottom:2px}
+.pos-card .pr{font-size:clamp(9px,1.5vw,11px);opacity:.7;line-height:1.5}
+
+.list{width:85%;text-align:left;margin:clamp(6px,1vh,12px) 0;list-style:none;padding:0}
+.list li{font-size:clamp(9px,1.7vw,13px);line-height:1.75;padding:3px 0 3px 16px;position:relative}
+.list li::before{content:'—';position:absolute;left:0;color:var(--gold);font-size:clamp(8px,1.4vw,11px)}
+
+@media(min-width:660px){.book-stage{width:min(100% - 48px,460px)}.indicator{bottom:32px;padding:8px 22px}}
+@media(min-width:1024px){body{padding:32px}.book-stage{width:min(100% - 64px,500px)}.indicator{bottom:48px;padding:10px 28px;font-size:15px}}
+@media(orientation:landscape) and (max-height:500px){
+  .book-stage{width:auto;height:calc(100dvh - 40px)}.book{width:auto;height:100%}
+  .indicator{bottom:6px;padding:3px 12px;font-size:10px}
+  .insight{padding:4px 8px;margin:3px 0}
+}
+</style>
+</head>
+<body>
+
+<div class="book-stage">
+  <div class="book-shadow"></div>
+  <div class="book" id="book"></div>
+  <div class="nav-zone nav-left" id="navLeft"></div>
+  <div class="nav-zone nav-right" id="navRight"></div>
+</div>
+<div class="indicator" id="indicator">封面 / 17</div>
+
+<script>
+(function(){
+var pages=[
+
+// ====== 0: COVER ======
+'<div class="pg-cover" style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:clamp(20px,4vw,40px)">'+
+  '<div style="color:var(--gold);font-size:clamp(14px,2.5vw,20px);margin-bottom:clamp(12px,2vh,24px);letter-spacing:6px">✦ ✦ ✦</div>'+
+  '<h1 style="font-size:clamp(28px,6.5vw,44px);letter-spacing:clamp(4px,1vw,8px);color:var(--gold)">十年之问</h1>'+
+  '<div class="divider-gold"></div>'+
+  '<div style="font-size:clamp(13px,2.5vw,18px);letter-spacing:clamp(3px,.6vw,6px);color:rgba(255,255,255,.7);margin-bottom:clamp(12px,2.5vh,28px)">一张图背后的投资哲学</div>'+
+  '<p style="color:rgba(255,255,255,.4);font-size:clamp(10px,1.8vw,12px);line-height:2">以段永平的口吻<br>讲述他的框架、他的选择、他的问题</p>'+
+  '<div style="color:var(--gold);font-size:clamp(12px,2vw,16px);margin-top:clamp(16px,3vh,32px)">✦ ✦ ✦</div>'+
+  '<p style="color:rgba(255,255,255,.2);font-size:clamp(9px,1.5vw,11px);letter-spacing:2px;margin-top:clamp(8px,1.5vh,16px)">Ariste 整理 · 2026.05</p>'+
+'</div>',
+
+// ====== 1: 三个时间切片 (2015-2021) ======
+'<div class="pg-dark" style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:clamp(3px,.5vh,6px);padding:clamp(14px,3vw,36px)">'+
+  '<div class="stat-label" style="color:rgba(255,255,255,.4)">一张图 · 三个时间切片</div>'+
+  '<div style="font-size:clamp(12px,2vw,15px);color:var(--gold);margin-bottom:4px;font-weight:600">📱 2015 · 移动互联网巅峰</div>'+
+  '<div class="chart-row"><span class="chart-label">英伟达</span><div class="chart-bar chart-nv" style="width:12%">~150亿</div></div>'+
+  '<div class="chart-row"><span class="chart-label">苹果</span><div class="chart-bar chart-ap" style="width:60%">~7500亿</div></div>'+
+  '<div class="chart-row"><span class="chart-label">中概股</span><div class="chart-bar chart-cn" style="width:110%">≈10×英伟达</div></div>'+
+  '<div class="divider-light"></div>'+
+  '<div style="font-size:clamp(12px,2vw,15px);color:var(--gold);margin-bottom:4px;font-weight:600">📱+🔧 2021 · 移动+芯片并行</div>'+
+  '<div class="chart-row"><span class="chart-label">苹果</span><div class="chart-bar chart-ap" style="width:150%">~2万亿</div></div>'+
+  '<div class="chart-row"><span class="chart-label">中概股</span><div class="chart-bar chart-cn" style="width:185%">峰值~2.5万亿</div></div>'+
+  '<p style="color:rgba(255,255,255,.3);font-size:clamp(9px,1.5vw,11px);margin-top:8px">BAT巅峰 · 互联网平台化浪潮</p>'+
+'</div>',
+
+// ====== 2: 三个时间切片 (2026) ======
+'<div class="pg-dark" style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:clamp(3px,.5vh,6px);padding:clamp(14px,3vw,36px)">'+
+  '<div style="font-size:clamp(12px,2vw,15px);color:var(--gold);margin-bottom:clamp(6px,1vh,12px);font-weight:600">🤖 2026 · AI算力时代</div>'+
+  '<div class="chart-row"><span class="chart-label">英伟达</span><div class="chart-bar chart-nv" style="width:100%">~5万亿</div></div>'+
+  '<div class="chart-row"><span class="chart-label">苹果</span><div class="chart-bar chart-ap" style="width:90%">~4.5万亿</div></div>'+
+  '<div class="chart-row"><span class="chart-label">比特币</span><div class="chart-bar chart-bt" style="width:40%">~2万亿</div></div>'+
+  '<div class="chart-row"><span class="chart-label">中概股</span><div class="chart-bar chart-cn" style="width:20%">~1万亿</div></div>'+
+  '<div class="divider-light"></div>'+
+  '<div class="insight" style="background:rgba(212,160,23,.08);border:1px solid rgba(212,160,23,.2)">'+
+    '<div class="il">📊 11年变迁</div>'+
+    '<p>英伟达 150亿→5万亿 · 300倍<br>中概股 10×英伟达 → 英伟达1/5<br>比特币 = 2× 中概股整体</p>'+
+  '</div>'+
+'</div>',
+
+// ====== 3: "这图不是给我看的" ======
+'<div class="pg-paper" style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:clamp(3px,.5vh,6px);padding:clamp(14px,3vw,36px)">'+
+  '<div class="stat-label" style="color:#8b7355">第一句话</div>'+
+  '<p style="color:var(--ink);font-size:clamp(11px,2.2vw,15px)">我不会否认数据。但<span style="color:var(--accent);font-weight:700">这张图把不同轨道上的公司放在同一张纸上了。</span></p>'+
+  '<p style="color:var(--ink);font-size:clamp(10px,2vw,13px)">2015年的英伟达、苹果、中概——护城河完全不同，现金流折现的逻辑完全不同。把市值放在一起，除了让你焦虑，没有投资决策价值。</p>'+
+  '<blockquote style="color:var(--accent)">"我不会因为中概从2.5T跌到1T就觉得它便宜。估值锚不是历史峰值。"</blockquote>'+
+  '<div class="divider-accent"></div>'+
+  '<p style="color:var(--ink);font-size:clamp(11px,2.2vw,15px);font-weight:700">真正的问题是：<br><span style="color:var(--accent)">哪一家公司十年后还在，<br>而且比今天赚更多钱？</span></p>'+
+'</div>',
+
+// ====== 4: 护城河不需要重挖 ======
+'<div class="pg-warm" style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:clamp(3px,.5vh,6px);padding:clamp(14px,3vw,36px)">'+
+  '<div class="stat-label" style="color:#8b7355">三关之第一关</div>'+
+  '<h2 style="color:var(--accent)">护城河不需要重挖</h2>'+
+  '<p style="color:var(--ink);font-size:clamp(10px,2vw,13px)">茅台不需要每年重新证明赤水河是真的。<br>苹果不需要每年重新说服用户 iOS 比 Android 好用。<br>英伟达不需要每年重新让开发者离开 CUDA。</p>'+
+  '<blockquote style="color:var(--accent)">护城河是"别人知道你赚钱但没法复制"——不是专利、不是先发优势，是切换成本和生态锁定。</blockquote>'+
+  '<div class="insight" style="background:rgba(139,69,19,.08);border:1px solid rgba(139,69,19,.2)">'+
+    '<div class="il" style="color:var(--accent)">🏔️ 地质学级别的护城河</div>'+
+    '<p style="color:var(--ink)">赤水河不会改道，CUDA 上几百万开发者的代码不会重写。这才是"十年后还在"的底气。</p>'+
+  '</div>'+
+'</div>',
+
+// ====== 5: 利润之上有追求 ======
+'<div class="pg-paper" style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:clamp(3px,.5vh,6px);padding:clamp(14px,3vw,36px)">'+
+  '<div class="stat-label" style="color:#8b7355">三关之第二关</div>'+
+  '<h2 style="color:var(--accent)">利润之上有追求</h2>'+
+  '<p style="color:var(--ink);font-size:clamp(10px,2vw,13px)">好公司不只为钱。苹果做产品不是为了利润最大化——它是利润最大化的<span style="color:var(--accent);font-weight:700">结果</span>。</p>'+
+  '<p style="color:var(--ink);font-size:clamp(10px,2vw,13px)">黄峥做拼多多不是因为电商能赚钱，是他觉得这件事值得做。</p>'+
+  '<p style="color:var(--ink);font-size:clamp(10px,2vw,13px)">这种公司不会为了季度报表砍研发、砍品质、杀鸡取卵。决策尺度是十年，不是三个月的财报季。</p>'+
+  '<blockquote style="color:var(--accent)">做对的事情，然后把事情做对。<br>对的事情，利润会自然跟上。</blockquote>'+
+'</div>',
+
+// ====== 6: 企业文化 ======
+'<div class="pg-warm" style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:clamp(3px,.5vh,6px);padding:clamp(14px,3vw,36px)">'+
+  '<div class="stat-label" style="color:#8b7355">三关之第三关</div>'+
+  '<h2 style="color:var(--accent)">企业文化让蠢事做不成</h2>'+
+  '<p style="color:var(--ink);font-size:clamp(10px,2vw,13px)">好的企业文化不是告诉员工做什么——是让错误的事情<span style="color:var(--accent);font-weight:700">根本通不过</span>。</p>'+
+  '<p style="color:var(--ink);font-size:clamp(10px,2vw,13px)">最难量化，但最重要。一家公司能不能在关键时刻不做蠢事——盲目扩张、追逐热点、用短期利润换长期根基——决定十年后还在不在。</p>'+
+  '<blockquote style="color:var(--accent)">企业文化是地基。<br>地基歪了，楼再高也会倒。</blockquote>'+
+  '<div class="divider-accent"></div>'+
+  '<p style="color:var(--ink);font-size:clamp(10px,2vw,13px);font-weight:600">护城河、追求、文化——不是 checklist。<br>过得了这三关，十年后大概率还在。<br>过不了的，涨了多少倍我都不碰。</p>'+
+'</div>',
+
+// ====== 7: 他的仓位 ======
+'<div class="pg-dark" style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:clamp(3px,.5vh,6px);padding:clamp(14px,3vw,36px)">'+
+  '<div class="stat-label" style="color:rgba(255,255,255,.4)">他的仓位，已经替他回答了</div>'+
+  '<div class="pos-card" style="background:rgba(118,185,0,.1);border:1px solid rgba(118,185,0,.25)"><span class="pn">🟢 英伟达</span><span class="pr">CUDA生态锁住AI开发者 · 2026Q1加仓至1384万股 · 第三大持仓</span></div>'+
+  '<div class="pos-card" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12)"><span class="pn">🍎 苹果</span><span class="pr">最深消费生态护城河 · 2011年3000亿时买入 · 不会消失的复利机器</span></div>'+
+  '<div class="pos-card" style="background:rgba(212,160,23,.08);border:1px solid rgba(212,160,23,.2)"><span class="pn">📦 拼多多</span><span class="pr">投黄峥，不投中概赛道 · TEMU→全球电商基础设施 · 从利基长成基础设施</span></div>'+
+  '<div class="pos-card" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12)"><span class="pn">🍶 茅台</span><span class="pr">赤水河不会改道 · 重要场合不会不喝 · 地质学级别的护城河</span></div>'+
+  '<div class="pos-card" style="background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.25)"><span class="pn">🫧 泡泡玛特</span><span class="pr">IP全球化→文化绑定 · 跟买苹果一个思路——不是买产品，是买文化</span></div>'+
+'</div>',
+
+// ====== 8: 英伟达深读 ======
+'<div class="pg-dark" style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:clamp(3px,.5vh,6px);padding:clamp(14px,3vw,36px)">'+
+  '<div class="stat-label" style="color:rgba(255,255,255,.4)">最反直觉的一笔</div>'+
+  '<h2 style="color:#76b900">英伟达 · 5万亿<br>为什么还加仓？</h2>'+
+  '<div class="divider" style="background:#76b900"></div>'+
+  '<p style="color:rgba(255,255,255,.75);font-size:clamp(10px,2vw,13px)">框架很简单：<span style="color:#76b900;font-weight:700">现金流的折现。</span></p>'+
+  '<div class="insight" style="background:rgba(118,185,0,.08);border:1px solid rgba(118,185,0,.2)">'+
+    '<div class="il" style="color:#76b900">💰 2026Q1 财报</div>'+
+    '<p>数据中心营收816亿美元，同比+92%<br>Q2指引910亿 · 全年3500亿+营收<br>扣现金PE <strong>不到20倍</strong></p>'+
+  '</div>'+
+  '<blockquote style="color:#76b900">CUDA生态锁住了AI时代的基础设施——开发者已经在上面了。这和iOS是一样的道理。</blockquote>'+
+  '<p style="color:rgba(255,255,255,.6);font-size:clamp(9px,1.8vw,12px)">苹果2011年PE 10倍我买了。<br>英伟达2026年PE不到20倍、每年翻倍——同一个逻辑。</p>'+
+'</div>',
+
+// ====== 9: 四家公司 ======
+'<div class="pg-gold" style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:clamp(3px,.5vh,6px);padding:clamp(14px,3vw,36px)">'+
+  '<div class="stat-label" style="color:rgba(255,255,255,.4)">四个逻辑</div>'+
+  '<div class="insight" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15)">'+
+    '<div class="il">🍎 苹果</div><p>最深消费生态护城河。不指望翻300倍，但不会消失。</p>'+
+  '</div>'+
+  '<div class="insight" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15)">'+
+    '<div class="il">📦 拼多多</div><p>不买中概赛道，买黄峥。TEMU→全球电商基础设施。从利基长成基础设施——这个轨迹我见过。</p>'+
+  '</div>'+
+  '<div class="insight" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15)">'+
+    '<div class="il">🍶 茅台</div><p>赤水河不会改道，重要场合不会不喝。地质学级护城河。</p>'+
+  '</div>'+
+  '<div class="insight" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15)">'+
+    '<div class="il">🫧 泡泡玛特</div><p>IP全球化最新押注。跟买苹果一样——不是买产品，是买"文化绑定"。</p>'+
+  '</div>'+
+  '<blockquote style="color:rgba(255,255,255,.5);font-size:clamp(9px,1.6vw,12px)">买股票就是买公司。<br>公司好不好不看市值涨跌，看十年后现金流。</blockquote>'+
+'</div>',
+
+// ====== 10: 网易+茅台案例 ======
+'<div class="pg-paper" style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:clamp(2px,.3vh,4px);padding:clamp(12px,2.5vw,32px)">'+
+  '<div class="stat-label" style="color:#8b7355">投资案例</div>'+
+  '<div class="insight" style="background:rgba(139,69,19,.08);border:1px solid rgba(139,69,19,.2)">'+
+    '<div class="il" style="color:var(--accent)">🎮 网易 · 2001年</div>'+
+    '<p style="color:var(--ink)"><strong>0.8美元买入 · 150倍回报</strong><br>互联网泡沫破裂，网易退市边缘。市场画的线：0.8美元，快破产了。<br>我画的线：<span style="color:var(--accent);font-weight:700">每股现金2美元</span>——账上现金比股价高一倍多。丁磊这个人，我相信他能做出好游戏。</p>'+
+  '</div>'+
+  '<div class="insight" style="background:rgba(139,69,19,.08);border:1px solid rgba(139,69,19,.2)">'+
+    '<div class="il" style="color:var(--accent)">🍶 茅台 · 2013年</div>'+
+    '<p style="color:var(--ink)"><strong>塑化剂事件后买入</strong><br>市场恐慌："白酒完了。"<br>我看到：赤水河还在、中国人还在喝酒、茅台还是那瓶茅台。市场恐慌和我的判断之间，有一条巨大的裂缝。</p>'+
+  '</div>'+
+'</div>',
+
+// ====== 11: 苹果+拼多多案例 ======
+'<div class="pg-warm" style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:clamp(2px,.3vh,4px);padding:clamp(12px,2.5vw,32px)">'+
+  '<div class="stat-label" style="color:#8b7355">投资案例</div>'+
+  '<div class="insight" style="background:rgba(139,69,19,.08);border:1px solid rgba(139,69,19,.2)">'+
+    '<div class="il" style="color:var(--accent)">🍎 苹果 · 2011年</div>'+
+    '<p style="color:var(--ink)"><strong>3000亿市值时买入</strong><br>市场说："手机红海，护城河挡不住三星。"<br>我看到：iOS生态已锁住开发者，切换成本让用户不会走。市场给10倍PE，荒谬。</p>'+
+  '</div>'+
+  '<div class="insight" style="background:rgba(139,69,19,.08);border:1px solid rgba(139,69,19,.2)">'+
+    '<div class="il" style="color:var(--accent)">📦 拼多多 · 暴跌时</div>'+
+    '<p style="color:var(--ink)"><strong>持续看好 · 涨3倍</strong><br>经历40%下跌仍持有。信的不是"中概回弹"——信的是黄峥这个人。</p>'+
+  '</div>'+
+'</div>',
+
+// ====== 12: 碰撞的本质 ======
+'<div class="pg-paper" style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:clamp(3px,.5vh,6px);padding:clamp(14px,3vw,36px)">'+
+  '<div class="stat-label" style="color:#8b7355">如何找到机会？</div>'+
+  '<h2 style="color:var(--accent)">"碰撞"的本质</h2>'+
+  '<p style="color:var(--ink);font-size:clamp(10px,2vw,13px)">碰撞不是去市场上"找"机会——机会是市场犯错时主动递给你的。</p>'+
+  '<blockquote style="color:var(--accent)">你的全部工作，就是在市场犯错之前，已经画好了自己的那根线。</blockquote>'+
+  '<div class="divider-accent"></div>'+
+  '<div class="insight" style="background:rgba(139,69,19,.08);border:1px solid rgba(139,69,19,.2)">'+
+    '<div class="il" style="color:var(--accent)">📐 第一张图：你画的"值多少"</div>'+
+    '<p style="color:var(--ink)">花几百个小时读年报、招股书、竞争格局、管理层发言。算出：十年后现金流折回来，值多少钱。这根线跟股价无关。</p>'+
+  '</div>'+
+  '<div class="insight" style="background:rgba(139,69,19,.08);border:1px solid rgba(139,69,19,.2)">'+
+    '<div class="il" style="color:var(--accent)">📉 第二张图：市场在恐慌什么</div>'+
+    '<p style="color:var(--ink)">塑化剂时的茅台、2011年的苹果、2022年的英伟达——市场每次都给出"看似合理"的恐慌理由。但你的线会告诉你：<strong>它被低估了。</strong></p>'+
+  '</div>'+
+'</div>',
+
+// ====== 13: 等分歧 ======
+'<div class="pg-dark" style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:clamp(3px,.5vh,6px);padding:clamp(14px,3vw,36px)">'+
+  '<div class="stat-label" style="color:rgba(255,255,255,.4)">寻找机会的方法</div>'+
+  '<h2 style="color:var(--gold)">等分歧，不等共识</h2>'+
+  '<blockquote style="color:var(--gold)">共识 = 价格已反映。<br>分歧才是定价错误的地方。</blockquote>'+
+  '<p style="color:rgba(255,255,255,.7);font-size:clamp(10px,2vw,13px)">2021年中概2.5T——贪婪共识。<br>2026年中概1T——有分歧，有定价错误，有公司被冤枉了。</p>'+
+  '<p style="color:rgba(255,255,255,.7);font-size:clamp(10px,2vw,13px)">但我不买"中概回弹"，<span style="color:var(--gold);font-weight:700">一家一家拆</span>——拼多多被冤枉，阿里有自己问题，京东另种故事。</p>'+
+  '<div class="divider-light"></div>'+
+  '<div class="insight" style="background:rgba(212,160,23,.08);border:1px solid rgba(212,160,23,.2)">'+
+    '<div class="il">🎯 缩小范围，加深深度</div>'+
+    '<p>不看500家公司，看5家。懂一家比浮光掠影看一百家有用。能力圈不是越大越好，是越深越好。</p>'+
+  '</div>'+
+  '<blockquote style="color:rgba(255,255,255,.5);font-size:clamp(10px,2vw,13px)">"我不在乎错过，我在乎做错。"</blockquote>'+
+'</div>',
+
+// ====== 14: 十年过滤器 ======
+'<div class="pg-paper" style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:clamp(3px,.5vh,6px);padding:clamp(14px,3vw,36px)">'+
+  '<div class="stat-label" style="color:#8b7355">最残酷的过滤器</div>'+
+  '<h2 style="color:var(--accent)">"如果你不想持有十年……"</h2>'+
+  '<p style="color:var(--ink);font-size:clamp(10px,2vw,13px)">这句话的真正用法不是拿十年——是<span style="color:var(--accent);font-weight:700">帮你提前淘汰99%的"机会"</span>。</p>'+
+  '<p style="color:var(--ink);font-size:clamp(10px,2vw,13px)">看到一个机会，问自己：我敢持有十年吗？<br>答案不是毫不犹豫的"敢"——那就不是机会，是噪音。</p>'+
+  '<div class="divider-accent"></div>'+
+  '<h2 style="font-size:clamp(13px,2.5vw,18px);color:var(--accent)">碰撞的三个变量</h2>'+
+  '<ul class="list">'+
+    '<li>你画的线和市场画的线之间的<span style="color:var(--accent);font-weight:700">裂缝</span></li>'+
+    '<li>你敢不敢<span style="color:var(--accent);font-weight:700">下重注</span></li>'+
+    '<li>你能<span style="color:var(--accent);font-weight:700">等多久</span></li>'+
+  '</ul>'+
+  '<p style="color:var(--ink);font-size:clamp(10px,2vw,13px)">三个缺一个，碰撞就不会发生。<br>有裂缝但不敢下注——看了个热闹。<br>敢下注但等不了——抄底在半山腰。</p>'+
+'</div>',
+
+// ====== 15: 他的建议 ======
+'<div class="pg-warm" style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:clamp(3px,.5vh,6px);padding:clamp(14px,3vw,36px)">'+
+  '<div class="stat-label" style="color:#8b7355">不是买什么，是怎么想</div>'+
+  '<ul class="list">'+
+    '<li><span style="color:var(--accent);font-weight:700">不买赛道买公司。</span>中概2.5T→1T不等于便宜——拆开算。</li>'+
+    '<li><span style="color:var(--accent);font-weight:700">不懂不碰。</span>比特币2T超过中概，我不关心。不是能力圈。</li>'+
+    '<li><span style="color:var(--accent);font-weight:700">便宜与否不看历史股价。</span>锚不是2021年峰值，是十年现金流vs今天价。</li>'+
+    '<li><span style="color:var(--accent);font-weight:700">持有时长决定一切。</span>愿意持有十年，你对"贵不贵"的判断会完全不同。</li>'+
+  '</ul>'+
+  '<div class="divider-accent"></div>'+
+  '<blockquote style="color:var(--accent)">十年后谁还在——不是猜的，是一个公司一个公司看出来的。每个10倍股十年前都有人觉得贵。区别不是谁更聪明，是谁真的读懂了，然后拿住了。</blockquote>'+
+  '<p style="color:var(--ink);font-size:clamp(11px,2.2vw,15px);font-weight:700">然后我会问你：<br><span style="color:var(--accent)">你现在愿意花多少时间，<br>去真正读懂一家公司？</span></p>'+
+'</div>',
+
+// ====== 16: BACK COVER ======
+'<div class="pg-cover" style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:clamp(20px,4vw,40px)">'+
+  '<div style="color:var(--gold);font-size:clamp(14px,2.5vw,20px);margin-bottom:clamp(12px,2vh,24px);letter-spacing:6px">✦ ✦ ✦</div>'+
+  '<h2 style="color:var(--gold);font-size:clamp(18px,3.5vw,26px)">风不公平吗？</h2>'+
+  '<div class="divider-gold"></div>'+
+  '<blockquote style="color:rgba(255,255,255,.7);font-size:clamp(12px,2.2vw,18px);line-height:2;max-width:85%">'+
+    '"不是市场在变——<br>是真正涨了300倍的那家公司，<br>做对了该做的事。"'+
+  '</blockquote>'+
+  '<div class="divider-gold"></div>'+
+  '<p style="color:rgba(255,255,255,.5);font-size:clamp(10px,1.8vw,13px);line-height:2">'+
+    '段永平的十年之问<br>整理于 2026年5月</p>'+
+  '<p style="color:rgba(255,255,255,.2);font-size:clamp(9px,1.5vw,11px);margin-top:clamp(8px,1.5vh,16px)">Ariste 🦞</p>'+
+'</div>'
+
+];
+
+var N=pages.length, cur=0, flip=false;
+var bk=document.getElementById('book'), ind=document.getElementById('indicator');
+
+function gP(i){return bk.querySelector('.page[data-page="'+i+'"]')}
+function uI(){ind.textContent=(cur===0?'封面':cur===N-1?'封底':(cur+1)+' / '+N)+' 页'}
+function rC(){
+  for(var i=0;i<N;i++){var e=gP(i);if(!e)continue;if(i===cur){e.style.display='flex';e.style.zIndex=2;e.style.opacity='1';e.className='page page-current'}else{e.style.display='none';e.style.opacity='0';e.className='page'}}
+  uI()
+}
+function cl(){var f=bk.querySelector('.page-flipper');if(f)f.remove();var s=bk.querySelector('.curl-shadow');if(s)s.remove()}
+
+for(var i=0;i<N;i++){
+  var d=document.createElement('div');
+  d.className='page';d.setAttribute('data-page',i);
+  d.innerHTML=pages[i];
+  bk.appendChild(d);
+}
+rC();
+
+function doFlip(dst,dir){
+  if(flip||dst<0||dst>=N)return;
+  var t=dst>cur?cur:dst;
+  flip=true;
+
+  var sh=document.createElement('div');
+  sh.className='curl-shadow';sh.style.opacity='0';
+  sh.style.transition='opacity .5s ease';
+  bk.appendChild(sh);
+  requestAnimationFrame(function(){sh.style.opacity='1'});
+
+  var fl=document.createElement('div');
+  fl.className='page-flipper';fl.style.zIndex='5';
+
+  var fr=document.createElement('div');
+  fr.className='page-front';
+  fr.innerHTML=dir>0?pages[t]:pages[cur];
+
+  var ba=document.createElement('div');
+  ba.className='page-back';
+  ba.innerHTML=dir>0?pages[dst]:pages[t];
+
+  fl.appendChild(fr);fl.appendChild(ba);
+  bk.appendChild(fl);
+
+  requestAnimationFrame(function(){
+    fl.style.transition='transform .7s cubic-bezier(0.15,0.7,0.3,1)';
+    fl.style.transform='rotateY('+(dir>0?-180:0)+'deg)';
+  });
+
+  fl.addEventListener('transitionend',function fn(){
+    fl.removeEventListener('transitionend',fn);
+    if(!flip)return;cl();cur=dst;rC();flip=false
+  });
+  setTimeout(function(){if(flip){cl();cur=dst;rC();flip=false}},900);
+}
+
+function next(){doFlip(cur+1,1)}
+function prev(){doFlip(cur-1,-1)}
+
+document.getElementById('navRight').addEventListener('click',next);
+document.getElementById('navLeft').addEventListener('click',prev);
+document.addEventListener('keydown',function(e){
+  if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' ')e.preventDefault(),next();
+  else if(e.key==='ArrowLeft'||e.key==='ArrowUp')e.preventDefault(),prev();
+});
+
+var tx=0,sw=false;
+document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX;sw=true},{passive:true});
+document.addEventListener('touchmove',function(e){if(sw)e.preventDefault()},{passive:false});
+document.addEventListener('touchend',function(e){
+  if(!sw)return;sw=false;
+  var dx=e.changedTouches[0].clientX-tx;
+  if(Math.abs(dx)>30){if(dx<0)next();else prev()}
+});
+
+})();
+</script>
+</body>
+</html>
